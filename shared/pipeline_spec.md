@@ -21,7 +21,7 @@ Implement the SAME logical pipeline in three ways:
    - Validate schema
    - Remove duplicates by (ds, user_id, category)
    - Aggregate: sum(amount) by (ds, category)
-   - **Failure injection**: first run for a given ds fails once (controlled by env var)
+   - Failure injection: first run for a given ds fails once (controlled by env var)
 3) Load
    - Write results to Postgres table `poc.output_agg`
    - Must be idempotent per ds (delete then insert OR upsert)
