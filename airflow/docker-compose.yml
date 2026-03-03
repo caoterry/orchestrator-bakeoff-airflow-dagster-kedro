@@ -1,0 +1,30 @@
+services:
+  airflow:
+    image: apache/airflow:2.9.3
+    container_name: poc-airflow
+    environment:
+      AIRFLOW__CORE__LOAD_EXAMPLES: "False"
+      AIRFLOW__WEBSERVER__EXPOSE_CONFIG: "True"
+
+      # 让容器里 Python 能 import 你的 shared 模块
+      PYTHONPATH: "/opt/airflow/shared/python"
+
+      # 业务 DB（就是你已经跑起来的那个 postgres）
+      POC_DB_URL: "postgresql+psycopg2://poc:pocpass@poc-postgres:5432/poc_db"
+      # 可选：用于演示 fail-once 重试（默认关闭）
+      POC_FAIL_ONCE: "${POC_FAIL_ONCE:-0}"
+
+      # 给 Airflow 容器临时装我们需要的包（PoC 用法）
+      _PIP_ADDITIONAL_REQUIREMENTS: "pandas sqlalchemy psycopg2-binary"
+    volumes:
+      - ../airflow/dags:/opt/airflow/dags
+      - ../shared/python:/opt/airflow/shared/python
+    ports:
+      - "8081:8080"
+    networks:
+      - poc-net
+    command: ["bash", "-lc", "airflow standalone"]
+
+networks:
+  poc-net:
+    external: true
